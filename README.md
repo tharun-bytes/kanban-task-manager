@@ -1,10 +1,6 @@
 # TaskFlow — Kanban Task Manager
 
 <p align="center">
-  <img src="taskflow/assets/background.png" alt="TaskFlow Banner" width="100%" style="border-radius: 8px;" />
-</p>
-
-<p align="center">
   <strong>A modern, responsive, portfolio-grade Kanban Task Manager built exclusively with vanilla web technologies.</strong>
 </p>
 
