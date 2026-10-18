@@ -1,0 +1,1824 @@
+/* ==========================================================================
+   TaskFlow - Modern Kanban Task Manager Stylesheet
+   Pure Vanilla CSS with 3D Push-Down Buttons (Uiverse by JasonMep),
+   Centered Narrow Layout, Top Navigation, and Open Canvas Board
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design System & CSS Variables
+   -------------------------------------------------------------------------- */
+:root {
+  /* Layout Color Palette */
+  --navy: #2D2E4F;
+  --navy-light: #3D3F68;
+  --navy-dark: #1F2039;
+  --navy-hover: #484A7A;
+  --navy-border: rgba(255, 255, 255, 0.12);
+
+  --cream: #EDE8C8;
+  --cream-light: #F7F4E2;
+  --cream-dark: #DCD6AF;
+  --cream-hover: #DFD8B3;
+
+  /* Tactile Shadows on Cream Canvas */
+  --cream-shadow-dark: #d3ceb0;
+  --cream-shadow-light: #ffffff;
+  --navy-shadow-dark: #1e1f35;
+  --navy-shadow-light: #3c3e69;
+
+  /* 3D Button Colors (JasonMep Theme) */
+  --btn-orange-bg: #e67e22;
+  --btn-orange-border: #f39c12;
+  --btn-orange-shadow: #d35400;
+
+  /* Accent & Action Colors */
+  --accent: #5C60F5;
+  --accent-hover: #4A4DE0;
+  --accent-light: rgba(92, 96, 245, 0.12);
+  --accent-focus: rgba(230, 126, 34, 0.35);
+
+  /* Text Colors */
+  --text-dark: #202138;
+  --text-muted: #6C6E85;
+  --text-light: #F4F5FB;
+  --text-light-muted: #9E9FB5;
+
+  /* Priority Colors */
+  --priority-high: #E63946;
+  --priority-high-bg: #FFE8EA;
+  --priority-high-border: #FCA5A5;
+
+  --priority-medium: #F4A261;
+  --priority-medium-bg: #FFF3EB;
+  --priority-medium-border: #FDBA74;
+
+  --priority-low: #2A9D8F;
+  --priority-low-bg: #E7F6F4;
+  --priority-low-border: #86EFAC;
+
+  /* Deadline Status Colors */
+  --status-overdue: #E63946;
+  --status-overdue-bg: #FEE2E2;
+  --status-today: #D97706;
+  --status-today-bg: #FEF3C7;
+  --status-soon: #2563EB;
+  --status-soon-bg: #DBEAFE;
+  --status-normal: #4B5563;
+  --status-normal-bg: #F3F4F6;
+  --status-done: #059669;
+  --status-done-bg: #D1FAE5;
+
+  /* Surfaces & Radii */
+  --card-bg: var(--cream);
+  --modal-bg: #FFFFFF;
+  --border-radius-sm: 5px;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-pill: 9999px;
+
+  /* Fonts */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   2. Reset & Global Styles
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100vh;
+  width: 100%;
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-dark);
+  background-color: var(--cream);
+  background-image: url('../assets/background.png');
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+  background-attachment: fixed;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+}
+
+/* --------------------------------------------------------------------------
+   3D TACTILE BUTTON STYLE (From Uiverse.io by JasonMep)
+   -------------------------------------------------------------------------- */
+.button, button {
+  color: #ecf0f1;
+  font-size: 15px;
+  background-color: #e67e22;
+  border: 1px solid #f39c12;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 8px 16px;
+  box-shadow: 0px 5px 0px #d35400;
+  transition: all 0.1s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  user-select: none;
+  text-decoration: none;
+}
+
+.button:hover, button:hover {
+  background-color: #f39c12;
+  border-color: #f1c40f;
+}
+
+.button:active, button:active {
+  box-shadow: 0px 2px 0px #d35400;
+  position: relative;
+  top: 2px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--btn-orange-border);
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(45, 46, 79, 0.2);
+  border-radius: var(--border-radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 46, 79, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   3. Dual-Zone Layout (Fitted to Exact Background)
+   -------------------------------------------------------------------------- */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   4. Left Navigation & Controls (Directly on Dark Navy Background Zone)
+   -------------------------------------------------------------------------- */
+.app-sidebar {
+  width: 22.7%;
+  min-width: 260px;
+  max-width: 330px;
+  padding: 24px 18px 24px max(24px, 4.3vw);
+  background: transparent;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+/* Brand & Logo */
+.sidebar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-light);
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background-color: #e67e22;
+  border: 1px solid #f39c12;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 0px #d35400;
+  font-size: 16px;
+  color: #FFFFFF;
+}
+
+.brand-text {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.brand-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+}
+
+.brand-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--text-light-muted);
+  padding: 2px 6px;
+  border-radius: var(--border-radius-pill);
+}
+
+.mobile-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* User Profile Chip */
+.sidebar-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+.user-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e67e22;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.user-role {
+  font-size: 0.68rem;
+  color: #a4a7c1;
+}
+
+.user-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #2ecc71;
+  box-shadow: 0 0 6px #2ecc71;
+  margin-left: auto;
+}
+
+/* 3D Primary Button: "+ New Task" */
+.sidebar-btn-new-task {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Sidebar Section Headers */
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ea1bf;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 2px;
+}
+
+/* Sidebar Priority Filters (3D Tactile Buttons on Navy Canvas) */
+.sidebar-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  border: 1px solid transparent;
+}
+
+/* Individual Filter Button Color Themes */
+/* 1. All Tasks - Royal Indigo */
+.filter-btn[data-filter="all"] {
+  background-color: rgba(92, 96, 245, 0.14);
+  border-color: rgba(92, 96, 245, 0.3);
+  color: #E0E2FE;
+  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.35);
+}
+.filter-btn[data-filter="all"]:hover {
+  background-color: rgba(92, 96, 245, 0.25);
+  border-color: rgba(92, 96, 245, 0.5);
+  color: #FFFFFF;
+}
+.filter-btn[data-filter="all"].active {
+  background-color: #5C60F5;
+  border-color: #797DF7;
+  color: #FFFFFF;
+  box-shadow: 0px 4px 0px #4347D9;
+}
+.filter-btn[data-filter="all"].active:active {
+  box-shadow: 0px 1px 0px #4347D9;
+  position: relative;
+  top: 2px;
+}
+
+/* 2. High Priority - Crimson Red */
+.filter-btn[data-filter="high"] {
+  background-color: rgba(231, 76, 60, 0.14);
+  border-color: rgba(231, 76, 60, 0.3);
+  color: #FECACA;
+  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.35);
+}
+.filter-btn[data-filter="high"]:hover {
+  background-color: rgba(231, 76, 60, 0.25);
+  border-color: rgba(231, 76, 60, 0.5);
+  color: #FFFFFF;
+}
+.filter-btn[data-filter="high"].active {
+  background-color: #E74C3C;
+  border-color: #EC7063;
+  color: #FFFFFF;
+  box-shadow: 0px 4px 0px #C0392B;
+}
+.filter-btn[data-filter="high"].active:active {
+  box-shadow: 0px 1px 0px #C0392B;
+  position: relative;
+  top: 2px;
+}
+
+/* 3. Medium Priority - Amber Orange */
+.filter-btn[data-filter="medium"] {
+  background-color: rgba(230, 126, 34, 0.14);
+  border-color: rgba(230, 126, 34, 0.3);
+  color: #FED7AA;
+  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.35);
+}
+.filter-btn[data-filter="medium"]:hover {
+  background-color: rgba(230, 126, 34, 0.25);
+  border-color: rgba(230, 126, 34, 0.5);
+  color: #FFFFFF;
+}
+.filter-btn[data-filter="medium"].active {
+  background-color: #E67E22;
+  border-color: #F39C12;
+  color: #FFFFFF;
+  box-shadow: 0px 4px 0px #D35400;
+}
+.filter-btn[data-filter="medium"].active:active {
+  box-shadow: 0px 1px 0px #D35400;
+  position: relative;
+  top: 2px;
+}
+
+/* 4. Low Priority - Emerald Green */
+.filter-btn[data-filter="low"] {
+  background-color: rgba(39, 174, 96, 0.14);
+  border-color: rgba(39, 174, 96, 0.3);
+  color: #BBF7D0;
+  box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.35);
+}
+.filter-btn[data-filter="low"]:hover {
+  background-color: rgba(39, 174, 96, 0.25);
+  border-color: rgba(39, 174, 96, 0.5);
+  color: #FFFFFF;
+}
+.filter-btn[data-filter="low"].active {
+  background-color: #27AE60;
+  border-color: #2ECC71;
+  color: #FFFFFF;
+  box-shadow: 0px 4px 0px #1E8449;
+}
+.filter-btn[data-filter="low"].active:active {
+  box-shadow: 0px 1px 0px #1E8449;
+  position: relative;
+  top: 2px;
+}
+
+.filter-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.filter-dot.all { background-color: #818CF8; }
+.filter-dot.high { background-color: #F87171; }
+.filter-dot.medium { background-color: #FBBF24; }
+.filter-dot.low { background-color: #34D399; }
+
+.filter-badge {
+  background-color: rgba(0, 0, 0, 0.25);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.filter-btn.active .filter-badge {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar Stats & Progress */
+.sidebar-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.sidebar-stat-chip {
+  background-color: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 6px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-stat-label {
+  font-size: 0.68rem;
+  color: #9ea1bf;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.sidebar-stat-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.sidebar-stat-val.overdue {
+  color: #f87171;
+}
+
+/* Progress card */
+.sidebar-progress-card {
+  background-color: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #9ea1bf;
+  font-weight: 600;
+}
+
+.sidebar-progress-percent {
+  color: #f39c12;
+  font-weight: 700;
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #f39c12, #2ecc71);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Clear All Tasks Button (3D Red) */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.btn-clear-sidebar {
+  width: 100%;
+  background-color: #c0392b;
+  border: 1px solid #e74c3c;
+  color: #ffffff;
+  box-shadow: 0px 4px 0px #962d22;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  border-radius: 5px;
+}
+
+.btn-clear-sidebar:hover {
+  background-color: #d63031;
+}
+
+.btn-clear-sidebar:active {
+  box-shadow: 0px 1px 0px #962d22;
+  top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   5. Right Main Workspace (Directly on Warm Cream Background Zone)
+   -------------------------------------------------------------------------- */
+.app-main-workspace {
+  flex: 1;
+  min-width: 0;
+  padding: 24px max(24px, 4.6vw) 40px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.workspace-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.workspace-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  background-color: #2B2C4B;
+  color: #FFFFFF;
+  border: 1px solid #3d3e64;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.workspace-heading {
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: -0.02em;
+}
+
+.workspace-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.workspace-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 260px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 32px 8px 34px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--cream-dark);
+  border-radius: 5px;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  border-color: #e67e22;
+  box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.25);
+  outline: none;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.search-clear-btn.visible {
+  display: flex;
+}
+
+.date-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--cream-dark);
+  padding: 7px 12px;
+  border-radius: 5px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  white-space: nowrap;
+}
+
+.date-pill i {
+  color: #e67e22;
+}
+
+.app-workspace-footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding-top: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Kanban Board & Open Columns (Seamless on Cream Canvas)
+   -------------------------------------------------------------------------- */
+.board-wrapper {
+  width: 100%;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+/* Open Columns directly on the background */
+.kanban-column {
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  transition: all 0.2s;
+}
+
+/* Drop Zone Highlight */
+.kanban-column.drop-target-active {
+  background-color: rgba(221, 214, 175, 0.45);
+  box-shadow: inset 4px 4px 10px var(--cream-shadow-dark), inset -4px -4px 10px var(--cream-shadow-light);
+  border: 2px dashed #e67e22;
+  border-radius: 8px;
+}
+
+/* Column Header */
+.column-header {
+  padding: 4px 4px 14px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: none;
+  background-color: transparent;
+}
+
+.column-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.column-indicator {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 1px 1px 3px var(--cream-shadow-dark);
+}
+
+.column-indicator.todo { background-color: #6366F1; }
+.column-indicator.inprogress { background-color: #e67e22; }
+.column-indicator.done { background-color: #10B981; }
+
+.column-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: -0.01em;
+}
+
+.column-count-badge {
+  background-color: var(--cream);
+  color: var(--navy);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  box-shadow: inset 1px 1px 3px var(--cream-shadow-dark);
+  border: 1px solid var(--cream-dark);
+}
+
+/* Column Quick Add Button (3D Tactile JasonMep Style with Status Colors) */
+.column-quick-add-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 5px;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  transition: all 0.1s;
+}
+
+/* 1. To Do Column Quick-Add - Royal Indigo */
+#column-todo .column-quick-add-btn {
+  background-color: #5C60F5;
+  border: 1px solid #797DF7;
+  box-shadow: 0px 3px 0px #4347D9;
+}
+#column-todo .column-quick-add-btn:hover {
+  background-color: #6C70F7;
+  border-color: #8C90F8;
+}
+#column-todo .column-quick-add-btn:active {
+  box-shadow: 0px 1px 0px #4347D9;
+  position: relative;
+  top: 1px;
+}
+
+/* 2. In Progress Column Quick-Add - Amber Orange */
+#column-inprogress .column-quick-add-btn {
+  background-color: #E67E22;
+  border: 1px solid #F39C12;
+  box-shadow: 0px 3px 0px #D35400;
+}
+#column-inprogress .column-quick-add-btn:hover {
+  background-color: #F39C12;
+  border-color: #F5B041;
+}
+#column-inprogress .column-quick-add-btn:active {
+  box-shadow: 0px 1px 0px #D35400;
+  position: relative;
+  top: 1px;
+}
+
+/* 3. Done Column Quick-Add - Emerald Green */
+#column-done .column-quick-add-btn {
+  background-color: #27AE60;
+  border: 1px solid #2ECC71;
+  box-shadow: 0px 3px 0px #1E8449;
+}
+#column-done .column-quick-add-btn:hover {
+  background-color: #2ECC71;
+  border-color: #58D68D;
+}
+#column-done .column-quick-add-btn:active {
+  box-shadow: 0px 1px 0px #1E8449;
+  position: relative;
+  top: 1px;
+}
+
+/* Scrollable Task Card List */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 200px;
+}
+
+/* Empty State Message inside a Column */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 36px 16px;
+  color: var(--text-muted);
+  border: 1px dashed rgba(45, 46, 79, 0.2);
+  border-radius: 8px;
+  margin: auto 0;
+  background-color: transparent;
+  box-shadow: inset 2px 2px 6px var(--cream-shadow-dark), inset -2px -2px 6px var(--cream-shadow-light);
+}
+
+.empty-state-graphic {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: rgba(230, 126, 34, 0.12);
+  color: #e67e22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  box-shadow: inset 2px 2px 4px var(--cream-shadow-dark);
+}
+
+.empty-state-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.empty-state-subtext {
+  font-size: 0.72rem;
+  margin-top: 3px;
+  opacity: 0.75;
+}
+
+/* --------------------------------------------------------------------------
+   7. Task Cards with Cover Images & Assignee Avatars
+   -------------------------------------------------------------------------- */
+.task-card {
+  background-color: var(--cream);
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 4px 4px 10px var(--cream-shadow-dark), -4px -4px 10px var(--cream-shadow-light);
+  border: 1px solid var(--cream-dark);
+  border-left-width: 5px;
+  cursor: grab;
+  position: relative;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+/* Card Cover Image */
+.card-cover-wrapper {
+  width: calc(100% + 28px);
+  margin: -14px -14px 6px -14px;
+  height: 125px;
+  overflow: hidden;
+  position: relative;
+  background-color: #dcd6af;
+}
+
+.card-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.task-card:hover .card-cover-img {
+  transform: scale(1.05);
+}
+
+/* Priority Left Borders */
+.task-card.priority-high {
+  border-left-color: var(--priority-high);
+}
+
+.task-card.priority-medium {
+  border-left-color: #e67e22;
+}
+
+.task-card.priority-low {
+  border-left-color: var(--priority-low);
+}
+
+/* Hover Lift */
+.task-card:hover {
+  transform: translateY(-2px);
+  border-color: #FFFFFF;
+  border-left-width: 5px;
+  box-shadow: 6px 6px 14px var(--cream-shadow-dark), -6px -6px 14px var(--cream-shadow-light);
+}
+
+.task-card:active {
+  cursor: grabbing;
+}
+
+/* Dragging State */
+.task-card.is-dragging {
+  opacity: 0.45;
+  transform: scale(0.97) rotate(1.5deg);
+  box-shadow: 8px 8px 18px var(--cream-shadow-dark);
+  border: 2px dashed #e67e22;
+}
+
+/* Card Header: Priority Pill + Actions */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Priority Pills - Inset into the card surface */
+.priority-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 7px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--cream);
+  box-shadow: inset 1px 1px 3px var(--cream-shadow-dark);
+}
+
+.priority-pill.high {
+  color: var(--priority-high);
+  border: 1px solid rgba(230, 57, 70, 0.25);
+}
+
+.priority-pill.medium {
+  color: #d35400;
+  border: 1px solid rgba(230, 126, 34, 0.35);
+}
+
+.priority-pill.low {
+  color: #0F766E;
+  border: 1px solid rgba(42, 157, 143, 0.3);
+}
+
+/* Card Action Buttons (3D Tactile JasonMep Micro-Buttons) */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-action-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  transition: all 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Edit Button - Warm Amber 3D Tactile */
+.card-action-btn.edit-btn {
+  background-color: #FAF5E6;
+  border: 1px solid #E2DAC0;
+  color: #7D6B4E;
+  box-shadow: 0px 2px 0px #CDC4A5;
+}
+
+.card-action-btn.edit-btn:hover {
+  background-color: #E67E22;
+  border-color: #F39C12;
+  color: #FFFFFF;
+  box-shadow: 0px 3px 0px #D35400;
+}
+
+.card-action-btn.edit-btn:active {
+  box-shadow: 0px 1px 0px #D35400;
+  position: relative;
+  top: 1px;
+}
+
+/* Delete Button - Crimson Red 3D Tactile */
+.card-action-btn.delete-btn {
+  background-color: #FAF5E6;
+  border: 1px solid #E2DAC0;
+  color: #7D6B4E;
+  box-shadow: 0px 2px 0px #CDC4A5;
+}
+
+.card-action-btn.delete-btn:hover {
+  background-color: #E74C3C;
+  border-color: #EC7063;
+  color: #FFFFFF;
+  box-shadow: 0px 3px 0px #C0392B;
+}
+
+.card-action-btn.delete-btn:active {
+  box-shadow: 0px 1px 0px #C0392B;
+  position: relative;
+  top: 1px;
+}
+
+/* Card Content */
+.card-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.card-description {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Card Footer: Deadline + Assignee + Mobile Move Fallback */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 8px;
+  margin-top: 2px;
+  border-top: 1px dashed rgba(45, 46, 79, 0.14);
+  font-size: 0.75rem;
+}
+
+.card-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Deadline Badges */
+.deadline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  background-color: var(--cream);
+  box-shadow: inset 1px 1px 3px var(--cream-shadow-dark);
+}
+
+.deadline-badge.overdue {
+  color: var(--status-overdue);
+  border: 1px solid rgba(230, 57, 70, 0.3);
+}
+
+.deadline-badge.due-today {
+  color: #d35400;
+  border: 1px solid rgba(230, 126, 34, 0.4);
+}
+
+.deadline-badge.due-soon {
+  color: var(--status-soon);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.deadline-badge.normal {
+  color: var(--status-normal);
+  border: 1px solid rgba(75, 85, 99, 0.2);
+}
+
+.deadline-badge.done {
+  color: var(--status-done);
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+/* Card Assignee Avatar Badge */
+.card-assignee-badge {
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.assignee-avatar-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FFFFFF;
+  box-shadow: 1px 1px 3px var(--cream-shadow-dark);
+}
+
+/* Mobile/Touch Move Dropdown */
+.mobile-move-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.move-select {
+  padding: 3px 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  background-color: #EDE8C8;
+  border: 1px solid #dcd6af;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0px 2px 0px #c2bc95;
+  transition: all 0.1s;
+}
+
+.move-select:hover {
+  border-color: #e67e22;
+}
+
+.move-select:focus {
+  outline: none;
+  border-color: #e67e22;
+}
+
+/* --------------------------------------------------------------------------
+   8. Modals (Task Form Modal & Confirmation Modal)
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(31, 32, 57, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-dialog {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+  transform: scale(0.94) translateY(12px);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-overlay.active .modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+.modal-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid #ECEEF4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.modal-close-btn {
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  border: 1px solid #bdc3c7;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0px 3px 0px #95a5a6;
+  transition: all 0.1s;
+}
+
+.modal-close-btn:hover {
+  background-color: #dfe6e9;
+}
+
+.modal-close-btn:active {
+  box-shadow: 0px 1px 0px #95a5a6;
+  top: 1px;
+}
+
+.modal-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  max-height: calc(85vh - 140px);
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-label .required-star {
+  color: var(--priority-high);
+  margin-left: 2px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #D6D8E5;
+  border-radius: 5px;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+  background-color: #FFFFFF;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s;
+}
+
+.form-control:focus {
+  border-color: #e67e22;
+  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.25);
+  outline: none;
+}
+
+.form-control.has-error {
+  border-color: var(--priority-high);
+  background-color: #FFF8F8;
+}
+
+.error-message {
+  font-size: 0.72rem;
+  color: var(--priority-high);
+  font-weight: 600;
+  display: none;
+  margin-top: 2px;
+}
+
+.error-message.visible {
+  display: block;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 65px;
+}
+
+/* Quick Cover Image Presets in Modal */
+.image-preset-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.preset-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.preset-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  border: 1px solid transparent;
+}
+
+.preset-btn[data-preset="security"] {
+  background-color: #EFF6FF;
+  border-color: #BFDBFE;
+  color: #1D4ED8;
+  box-shadow: 0px 2px 0px #93C5FD;
+}
+.preset-btn[data-preset="security"]:hover {
+  background-color: #DBEAFE;
+}
+.preset-btn[data-preset="security"]:active {
+  box-shadow: 0px 0px 0px #93C5FD;
+  position: relative;
+  top: 1px;
+}
+
+.preset-btn[data-preset="code"] {
+  background-color: #F5F3FF;
+  border-color: #DDD6FE;
+  color: #6D28D9;
+  box-shadow: 0px 2px 0px #C4B5FD;
+}
+.preset-btn[data-preset="code"]:hover {
+  background-color: #EDE9FE;
+}
+.preset-btn[data-preset="code"]:active {
+  box-shadow: 0px 0px 0px #C4B5FD;
+  position: relative;
+  top: 1px;
+}
+
+.preset-btn[data-preset="design"] {
+  background-color: #FFF7ED;
+  border-color: #FED7AA;
+  color: #C2410C;
+  box-shadow: 0px 2px 0px #FDBA74;
+}
+.preset-btn[data-preset="design"]:hover {
+  background-color: #FFEDD5;
+}
+.preset-btn[data-preset="design"]:active {
+  box-shadow: 0px 0px 0px #FDBA74;
+  position: relative;
+  top: 1px;
+}
+
+.preset-btn.clear-preset-btn {
+  background-color: #FEF2F2;
+  border-color: #FECACA;
+  color: #DC2626;
+  box-shadow: 0px 2px 0px #FCA5A5;
+}
+.preset-btn.clear-preset-btn:hover {
+  background-color: #FEE2E2;
+}
+.preset-btn.clear-preset-btn:active {
+  box-shadow: 0px 0px 0px #FCA5A5;
+  position: relative;
+  top: 1px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Priority Custom Radio Group */
+.priority-options-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.priority-radio-label {
+  border: 1px solid #D6D8E5;
+  border-radius: 5px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.1s;
+  user-select: none;
+  background: #f7f7f9;
+  box-shadow: 0px 2px 0px #bdc3c7;
+}
+
+.priority-radio-label input[type="radio"] {
+  display: none;
+}
+
+.priority-radio-label:hover {
+  background-color: #ededf2;
+}
+
+/* High Selected */
+.priority-radio-label:has(input[value="high"]:checked) {
+  background-color: var(--priority-high-bg);
+  border-color: var(--priority-high);
+  color: var(--priority-high);
+  box-shadow: 0px 2px 0px #e63946;
+}
+
+/* Medium Selected */
+.priority-radio-label:has(input[value="medium"]:checked) {
+  background-color: var(--priority-medium-bg);
+  border-color: #e67e22;
+  color: #d35400;
+  box-shadow: 0px 2px 0px #e67e22;
+}
+
+/* Low Selected */
+.priority-radio-label:has(input[value="low"]:checked) {
+  background-color: var(--priority-low-bg);
+  border-color: var(--priority-low);
+  color: #0F766E;
+  box-shadow: 0px 2px 0px #2a9d8f;
+}
+
+/* Modal Footer Buttons */
+.modal-footer {
+  padding: 14px 22px;
+  border-top: 1px solid #ECEEF4;
+  background-color: #FAFAFC;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-secondary {
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 5px;
+  background-color: #475569;
+  color: #F8FAFC;
+  border: 1px solid #64748B;
+  font-weight: 600;
+  box-shadow: 0px 4px 0px #334155;
+  transition: all 0.1s;
+}
+
+.btn-secondary:hover {
+  background-color: #334155;
+  border-color: #475569;
+}
+
+.btn-secondary:active {
+  box-shadow: 0px 1px 0px #1E293B;
+  position: relative;
+  top: 1px;
+}
+
+.btn-primary {
+  padding: 8px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  background-color: #E67E22;
+  color: #FFFFFF;
+  border: 1px solid #F39C12;
+  font-weight: 600;
+  box-shadow: 0px 4px 0px #D35400;
+  transition: all 0.1s;
+}
+
+.btn-primary:hover {
+  background-color: #F39C12;
+  border-color: #F5B041;
+}
+
+.btn-primary:active {
+  box-shadow: 0px 1px 0px #D35400;
+  position: relative;
+  top: 1px;
+}
+
+.btn-danger {
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 5px;
+  background-color: #E74C3C;
+  color: #FFFFFF;
+  border: 1px solid #FF6B5B;
+  font-weight: 600;
+  box-shadow: 0px 4px 0px #C0392B;
+  transition: all 0.1s;
+}
+
+.btn-danger:hover {
+  background-color: #C0392B;
+}
+
+.btn-danger:active {
+  box-shadow: 0px 1px 0px #962D22;
+  position: relative;
+  top: 1px;
+}
+
+/* Confirmation Dialog Specific Styles */
+.confirm-dialog {
+  max-width: 400px;
+  text-align: center;
+  padding: 24px 20px 18px 20px;
+}
+
+.confirm-icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #FEE2E2;
+  color: var(--priority-high);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin: 0 auto 14px auto;
+  box-shadow: 0 4px 10px rgba(230, 57, 70, 0.2);
+}
+
+.confirm-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.confirm-message {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   9. Toast Notification System
+   -------------------------------------------------------------------------- */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background-color: var(--navy-dark);
+  color: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: 5px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  border-left: 4px solid #e67e22;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 250px;
+  max-width: 380px;
+  animation: toastSlideIn 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.toast.toast-success {
+  border-left-color: #10B981;
+}
+
+.toast.toast-danger {
+  border-left-color: var(--priority-high);
+}
+
+.toast.toast-info {
+  border-left-color: #e67e22;
+}
+
+.toast-icon {
+  font-size: 1rem;
+}
+
+.toast.toast-success .toast-icon { color: #34D399; }
+.toast.toast-danger .toast-icon { color: #F87171; }
+.toast.toast-info .toast-icon { color: #f39c12; }
+
+.toast-content {
+  flex: 1;
+}
+
+.toast.hiding {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Narrow Footer */
+/* Sidebar Backdrop for Mobile Drawer */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.active {
+  display: block;
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   10. Responsive Design
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    background-color: #2B2C4B;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1000;
+    padding: 20px 18px 24px 20px;
+  }
+
+  .app-sidebar.active {
+    transform: translateX(0);
+  }
+
+  .mobile-close-btn {
+    display: block;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .app-main-workspace {
+    padding: 16px 20px 36px 20px;
+  }
+
+  .kanban-board {
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
+    overflow-x: auto;
+    padding-bottom: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .workspace-topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .workspace-topbar-right {
+    justify-content: space-between;
+  }
+
+  .search-wrapper {
+    flex: 1;
+    width: auto;
+  }
+
+  .kanban-board {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    overflow-x: visible;
+  }
+
+  .kanban-column {
+    min-height: auto;
+  }
+
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal-dialog {
+    max-width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: 90vh;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .toast-container {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+}

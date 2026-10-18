@@ -1,0 +1,16 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor directories
+.vscode/
+.idea/
+
+# Node / NPM (if any)
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Scratch and test files
+scratch/

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TaskFlow — Polished, portfolio-grade Kanban Task Manager built with vanilla HTML, CSS, and modern JavaScript.">
+  <title>TaskFlow — Kanban Task Manager</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%232D2E4F%22/><path d=%22M26 30h12v40H26zM44 30h12v25H44zM62 30h12v32H62z%22 fill=%22%23e67e22%22/></svg>">
+</head>
+<body>
+
+  <!-- Full Dual-Zone Layout (Fitted to Background: Left Navy Sidebar + Right Cream Workspace) -->
+  <div class="app-layout">
+
+    <!-- ====================================================================
+         1. LEFT NAVIGATION & CONTROLS (Directly in Dark Navy Zone)
+         ==================================================================== -->
+    <aside id="sidebar" class="app-sidebar" aria-label="TaskFlow Navigation & Controls">
+      
+      <!-- Brand & Mobile Close -->
+      <div class="sidebar-brand-row">
+        <a href="#" class="brand" aria-label="TaskFlow Home">
+          <div class="brand-icon" aria-hidden="true">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div class="brand-text">
+            <div class="brand-name">TaskFlow</div>
+            <span class="brand-badge">Kanban</span>
+          </div>
+        </a>
+        <button id="mobile-close-btn" class="mobile-close-btn" aria-label="Close navigation menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- User Profile Chip -->
+      <div class="sidebar-user-chip" title="Signed in as Alex Morgan">
+        <img
+          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&auto=format&fit=crop&crop=face"
+          alt="Alex Morgan avatar"
+          class="user-avatar-img"
+        >
+        <div class="user-info">
+          <span class="user-name">Alex M.</span>
+          <span class="user-role">Lead • Online</span>
+        </div>
+        <span class="user-status-dot" aria-label="Online"></span>
+      </div>
+
+      <!-- 3D "+ New Task" Primary Button (Uiverse.io by JasonMep) -->
+      <button id="open-create-modal-btn" class="button btn-new-task sidebar-btn-new-task" aria-label="Create a new task">
+        <i class="fa-solid fa-plus"></i>
+        <span>New Task</span>
+      </button>
+
+      <!-- Priority Filter Section -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">
+          <i class="fa-solid fa-filter" aria-hidden="true"></i> Priority Filter
+        </div>
+        <div class="sidebar-filters" role="tablist">
+          <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">
+            <span class="filter-dot all" aria-hidden="true"></span>
+            <span>All Tasks</span>
+            <span id="filter-count-all" class="filter-badge">0</span>
+          </button>
+          <button class="filter-btn" data-filter="high" role="tab" aria-selected="false">
+            <span class="filter-dot high" aria-hidden="true"></span>
+            <span>High</span>
+            <span id="filter-count-high" class="filter-badge">0</span>
+          </button>
+          <button class="filter-btn" data-filter="medium" role="tab" aria-selected="false">
+            <span class="filter-dot medium" aria-hidden="true"></span>
+            <span>Medium</span>
+            <span id="filter-count-medium" class="filter-badge">0</span>
+          </button>
+          <button class="filter-btn" data-filter="low" role="tab" aria-selected="false">
+            <span class="filter-dot low" aria-hidden="true"></span>
+            <span>Low</span>
+            <span id="filter-count-low" class="filter-badge">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Productivity Stats Section -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">
+          <i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Overview
+        </div>
+        <div class="sidebar-stats-grid">
+          <div class="sidebar-stat-chip">
+            <span class="sidebar-stat-label">Total</span>
+            <span id="stat-total" class="sidebar-stat-val">0</span>
+          </div>
+          <div class="sidebar-stat-chip">
+            <span class="sidebar-stat-label">Done</span>
+            <span id="stat-completed" class="sidebar-stat-val">0</span>
+          </div>
+          <div class="sidebar-stat-chip">
+            <span class="sidebar-stat-label">Overdue</span>
+            <span id="stat-overdue" class="sidebar-stat-val overdue">0</span>
+          </div>
+        </div>
+
+        <!-- Completion Rate Progress -->
+        <div class="sidebar-progress-card">
+          <div class="sidebar-progress-header">
+            <span>Completion Rate</span>
+            <span id="stat-progress-percent" class="sidebar-progress-percent">0%</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div id="stat-progress-fill" class="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom: Clear All Tasks Button -->
+      <div class="sidebar-footer">
+        <button id="clear-all-btn" class="button btn-clear-sidebar" aria-label="Clear all tasks" title="Clear all tasks">
+          <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+          <span>Clear All Tasks</span>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Mobile Drawer Backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ====================================================================
+         2. RIGHT WORKSPACE (Directly in Warm Cream Zone)
+         ==================================================================== -->
+    <main class="app-main-workspace" id="main-content" aria-label="Kanban Board Workspace">
+      
+      <!-- Top Workspace Bar: Mobile Toggle, Search, Date Display -->
+      <header class="workspace-topbar" aria-label="Board controls">
+        <div class="workspace-topbar-left">
+          <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Open navigation menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="workspace-heading">
+            <h1 class="workspace-title">My Board</h1>
+            <p class="workspace-subtitle">Sprint planning &amp; task progress</p>
+          </div>
+        </div>
+
+        <div class="workspace-topbar-right">
+          <!-- Live Search Input -->
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+            <input
+              type="text"
+              id="search-input"
+              class="search-input"
+              placeholder="Search tasks..."
+              aria-label="Search tasks by title or description"
+            >
+            <button id="search-clear-btn" class="search-clear-btn" aria-label="Clear search input">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Current Date Pill -->
+          <div class="date-pill" id="current-date-pill" aria-label="Current date">
+            <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+            <span id="date-display-text">--</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Kanban 3-Column Board -->
+      <div class="kanban-board">
+
+        <!-- Column 1: To Do -->
+        <div class="kanban-column" id="column-todo" data-status="todo" role="region" aria-label="To Do Column">
+          <div class="column-header">
+            <div class="column-header-left">
+              <span class="column-indicator todo" aria-hidden="true"></span>
+              <h2 class="column-title">To Do</h2>
+              <span id="todo-count" class="column-count-badge">0</span>
+            </div>
+            <button class="button column-quick-add-btn" data-status-preset="todo" aria-label="Add task to To Do column" title="Add task to To Do">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+          <div class="task-list" id="todo-list" data-status="todo">
+            <!-- Task cards rendered dynamically here -->
+          </div>
+        </div>
+
+        <!-- Column 2: In Progress -->
+        <div class="kanban-column" id="column-inprogress" data-status="inprogress" role="region" aria-label="In Progress Column">
+          <div class="column-header">
+            <div class="column-header-left">
+              <span class="column-indicator inprogress" aria-hidden="true"></span>
+              <h2 class="column-title">In Progress</h2>
+              <span id="inprogress-count" class="column-count-badge">0</span>
+            </div>
+            <button class="button column-quick-add-btn" data-status-preset="inprogress" aria-label="Add task to In Progress column" title="Add task to In Progress">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+          <div class="task-list" id="inprogress-list" data-status="inprogress">
+            <!-- Task cards rendered dynamically here -->
+          </div>
+        </div>
+
+        <!-- Column 3: Done -->
+        <div class="kanban-column" id="column-done" data-status="done" role="region" aria-label="Done Column">
+          <div class="column-header">
+            <div class="column-header-left">
+              <span class="column-indicator done" aria-hidden="true"></span>
+              <h2 class="column-title">Done</h2>
+              <span id="done-count" class="column-count-badge">0</span>
+            </div>
+            <button class="button column-quick-add-btn" data-status-preset="done" aria-label="Add task to Done column" title="Add task to Done">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+          <div class="task-list" id="done-list" data-status="done">
+            <!-- Task cards rendered dynamically here -->
+          </div>
+        </div>
+
+      </div>
+
+      <footer class="app-workspace-footer">
+        <span>TaskFlow &bull; Pure Vanilla HTML, CSS &amp; JavaScript</span>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- ====================================================================
+       4. MODAL: Add / Edit Task
+       ==================================================================== -->
+  <div id="task-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-heading" class="modal-title">New Task</h3>
+        <button id="modal-close-btn" class="modal-close-btn" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="task-form" novalidate>
+        <!-- Hidden input for task ID during edit -->
+        <input type="hidden" id="task-id" value="">
+
+        <div class="modal-body">
+          <!-- Title Input (Required) -->
+          <div class="form-group">
+            <label for="task-title" class="form-label">
+              <span>Task Title <span class="required-star" aria-hidden="true">*</span></span>
+            </label>
+            <input
+              type="text"
+              id="task-title"
+              class="form-control"
+              placeholder="e.g. Implement user authentication"
+              required
+              maxlength="120"
+              autocomplete="off"
+            >
+            <div id="title-error" class="error-message">Task title is required.</div>
+          </div>
+
+          <!-- Description Input (Optional) -->
+          <div class="form-group">
+            <label for="task-desc" class="form-label">
+              <span>Description <span style="font-weight: 400; color: var(--text-muted);">(optional)</span></span>
+            </label>
+            <textarea
+              id="task-desc"
+              class="form-control"
+              placeholder="Add key objectives, links, or notes..."
+              rows="3"
+              maxlength="500"
+            ></textarea>
+          </div>
+
+          <!-- Cover Image Input (Optional) -->
+          <div class="form-group">
+            <label for="task-image" class="form-label">
+              <span>Cover Image URL <span style="font-weight: 400; color: var(--text-muted);">(optional)</span></span>
+            </label>
+            <input
+              type="url"
+              id="task-image"
+              class="form-control"
+              placeholder="https://images.unsplash.com/... (optional)"
+              autocomplete="off"
+            >
+            <!-- Quick Image Presets -->
+            <div class="image-preset-tags">
+              <span class="preset-label">Quick covers:</span>
+              <button type="button" class="preset-btn" data-preset="security">🔒 Security</button>
+              <button type="button" class="preset-btn" data-preset="code">💻 Code</button>
+              <button type="button" class="preset-btn" data-preset="design">🎨 Design</button>
+              <button type="button" class="preset-btn clear-preset-btn" data-preset="none">✖ None</button>
+            </div>
+          </div>
+
+          <!-- Priority Custom Radio Pills -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>Priority</span>
+            </label>
+            <div class="priority-options-group" role="radiogroup" aria-label="Task Priority">
+              <label class="priority-radio-label">
+                <input type="radio" name="priority" value="high">
+                <i class="fa-solid fa-circle-exclamation" style="color: var(--priority-high);"></i>
+                <span>High</span>
+              </label>
+              <label class="priority-radio-label">
+                <input type="radio" name="priority" value="medium" checked>
+                <i class="fa-solid fa-triangle-exclamation" style="color: var(--priority-medium);"></i>
+                <span>Medium</span>
+              </label>
+              <label class="priority-radio-label">
+                <input type="radio" name="priority" value="low">
+                <i class="fa-solid fa-circle-check" style="color: var(--priority-low);"></i>
+                <span>Low</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Row: Deadline & Column Status -->
+          <div class="form-row">
+            <!-- Deadline Date Picker -->
+            <div class="form-group">
+              <label for="task-deadline" class="form-label">
+                <span>Deadline</span>
+              </label>
+              <input
+                type="date"
+                id="task-deadline"
+                class="form-control"
+              >
+            </div>
+
+            <!-- Column / Status Select -->
+            <div class="form-group">
+              <label for="task-status" class="form-label">
+                <span>Column Status</span>
+              </label>
+              <select id="task-status" class="form-control">
+                <option value="todo">To Do</option>
+                <option value="inprogress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="modal-cancel-btn" class="button btn-secondary">Cancel</button>
+          <button type="submit" id="modal-submit-btn" class="button btn-primary">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       5. MODAL: Custom Confirm Dialog (Delete & Clear)
+       ==================================================================== -->
+  <div id="confirm-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal-dialog confirm-dialog">
+      <div class="confirm-icon-wrapper" aria-hidden="true">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 id="confirm-title" class="confirm-title">Confirm Action</h3>
+      <p id="confirm-message" class="confirm-message">Are you sure you want to proceed?</p>
+      <div class="confirm-actions">
+        <button type="button" id="confirm-cancel-btn" class="button btn-secondary">Cancel</button>
+        <button type="button" id="confirm-action-btn" class="button btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       6. Toast Notifications Container
+       ==================================================================== -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
